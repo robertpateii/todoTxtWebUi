@@ -47,7 +47,7 @@
  * @param ctx an Array of Context values as referenced in the original task
  * @param task the original task as listed in the todo.txt file
  */
-function Task(pri, created, completed, proj, ctx, isActive, task) {
+function Task(pri, created, completed, proj, ctx, isActive, task, rank) {
 	this.id = createUUID();
 	this.priority = pri;
 	this.createdDate = created;
@@ -56,6 +56,7 @@ function Task(pri, created, completed, proj, ctx, isActive, task) {
 	this.contexts = ctx;
 	this.isActive = isActive;
 	this.taskString = task;
+  this.rank = rank;
 }
 
 /**
@@ -285,7 +286,7 @@ function getSortedTaskArrayFromLocalStorage() {
 	for (var key in localStorage) {
 		taskArray[index++] = JSON.parse(localStorage.getItem(key));
 	}
-	taskArray.sort(compareTasks);
+	taskArray.sort(compareTasksByRank);
 	
 	return taskArray;
 }
@@ -377,7 +378,8 @@ function parseTodoTxtFile(todoTxt) {
 		// ignore empty lines
 		if (elem != null && elem != "") {
 			// parse the individual line and return a Task
-			var task = createTaskObjFromTextLine(elem);
+      // empty lines are skipped but still take up a rank (n)
+			var task = createTaskObjFromTextLine(elem, n);
 			
 			// add this taskObj to our global list in it's proper location
 			addTaskToLocalStorage(task);
@@ -401,7 +403,7 @@ function parseTodoTxtFile(todoTxt) {
  * @param textLine a single line from the todo.txt file to be parsed
  * into a Task Object
  */
-function createTaskObjFromTextLine(textLine) {
+function createTaskObjFromTextLine(textLine, rank) {
 	// get the priority of the task EX: (A)
 	var pri = parsePriorityFromString(textLine);
 	
@@ -424,7 +426,7 @@ function createTaskObjFromTextLine(textLine) {
 	}
 	
 	// create the Task Object
-	var task = new Task(pri, created, completed, proj, ctx, isActive, textLine);
+	var task = new Task(pri, created, completed, proj, ctx, isActive, textLine, rank);
 	
 	// return Task Object to caller
 	return task;
@@ -807,11 +809,22 @@ function refreshFilters() {
 }
 
 /**
+ * function will allow sorting of tasks by rank which is
+ * based on the order they appeared in the text file.
+ */
+function compareTasksByRank(taskA, taskB) {
+	var aRank = taskA.rank;
+	var bRank = taskB.rank;
+  
+  return aRank - bRank;
+}
+
+/**
  * function will allow sorting of tasks by the following
  * criteria: (1) active vs. closed (2) priority (3) created date
  * (4) completed date
  */
-function compareTasks(taskA, taskB) {
+function compareTasksByPriority(taskA, taskB) {
 	var aActive = taskA.isActive;
 	var bActive = taskB.isActive;
 	var aPri = taskA.priority;
