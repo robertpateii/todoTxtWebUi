@@ -74,6 +74,30 @@ var isDirty = false;		// used to signify that something has been modified
 var filters = new Filters();
 /*####---------------------END GLOBALS---------------------####*/
 
+/*####---------------------BEGIN UTIITIES---------------------####*/
+/**
+ * check for console. if it's not present, creates a console 
+ * object with methods that do nothing. Thus you avoid errors
+ * in browsers without a console.
+ */
+if(typeof console === "undefined") {
+    console = {
+        debug: function() { },
+        dir: function() { },
+        error: function() { },
+        group: function() { },
+        groupCollapsed: function() { },
+        groupEnd: function() { },
+        info: function() { },
+        log: function() { },
+        time: function() { },
+        timeEnd: function() { },
+        trace: function() { },
+        warn: function() { }
+    };
+}
+/*####---------------------END UTIITIES---------------------####*/
+
 /**
  * this will load any items that need to be configured at page
  * load time such as event handlers, etc.
