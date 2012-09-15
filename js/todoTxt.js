@@ -631,10 +631,19 @@ function downloadTodoTxtFile() {
 		content += taskArray[i].taskString + "\n";
 	}
 	
-	var data = "data:text;charset=utf-8," +
+	var data = "data:text/plain;charset=utf-8," +
 	encodeURI(content);
 	
-	window.location.href = data;
+  // creates a link with the download attribute
+  // and clicks it, forcing a download (currently only in chrome.)
+  // http://stackoverflow.com/a/11686113/352087
+  var evt = document.createEvent("HTMLEvents");
+  evt.initEvent("click");
+  $("<a>", {
+    download: "todo.txt",
+    href: data
+  }).get(0).dispatchEvent(evt);
+    
 }
 
 /**
